@@ -1,2 +1,1 @@
-# nabiev_instagram_bot_locations_like
-Nabiev locations like instagram bot
+Your instagram profile will automatically click "like" on other people's posts.

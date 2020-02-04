@@ -83,14 +83,14 @@ const instagram = {
 
                     await instagram.page.waitFor(2000);
 
-                    let isLikable = await instagram.page.$('span[aria-label="Like"]');
+                    let isLikable = await instagram.page.$('svg[aria-label="Like"]');
 
                     console.log('isLikable outside if', isLikable);
 
                     if (isLikable) {
 
                         console.log('isLikable inside if', isLikable);
-                        await instagram.page.click('span[aria-label="Like"]');
+                        await instagram.page.click('svg[aria-label="Like"]');
 
                     }
 

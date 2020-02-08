@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const BASE_URL = 'https://instagram.com/';
 
-const TAG_URL = (tag) => 'https://www.instagram.com/explore/locations/' + tag;
+const LOCATION_URL = (location) => 'https://www.instagram.com/explore/locations/' + location;
 
 const instagram = {
 
@@ -13,11 +13,10 @@ const instagram = {
 
         instagram.browser = await puppeteer.launch({
             headless: false,
-			defaultViewport: null,
+            defaultViewport: null,
             args: ['--lang=en-US']
         });
         instagram.page = await instagram.browser.newPage();
-		
 
     },
 
@@ -37,7 +36,7 @@ const instagram = {
             waitUntil: "networkidle2"
         });
 
-        await instagram.page.waitFor(4000);
+        await instagram.page.waitFor(2000);
 
         await instagram.page.type('input[name="username"]', username, {
             delay: 50
@@ -49,64 +48,56 @@ const instagram = {
         loginButton = await instagram.page.$x('//div[contains(text(),"Log In")]');
         await loginButton[0].click();
 
-        // await instagram.page.waitFor(10000);
-        // await instagram.page.waitFor('a > span[aria-label="Profile"]');
-
         await instagram.page.waitFor(4000);
         notificationsButton = await instagram.page.$x('//button[contains(text(),"Not Now")]');
         await notificationsButton[0].click();
 
     },
-	
-	
-	
-    likeTagsProcess: async(tags = []) => {
 
-        for (let i = 0; i < 3; i++) {
-            for (let tag of tags) {
-				
-                await instagram.page.goto(TAG_URL(tag), {
-                    waitUntil: 'networkidle2'
-                });
-                await instagram.page.waitFor(1000);
-                let posts = await instagram.page.$$('article > div:nth-child(4) img[decoding="auto"]');
+    likeLocationsProcess: async(locations = []) => {
+        for (let location of locations) {
 
-                for (let i = 0; i < 3; i++) {
-                    let post = posts[i];
+            await instagram.page.goto(LOCATION_URL(location), {
+                waitUntil: 'networkidle2'
+            });
 
-                    await post.click();
+            await instagram.page.waitFor(1000);
 
-                    await instagram.page.waitFor('body[style="overflow: hidden;"]');
+            let posts = await instagram.page.$$('article > div:nth-child(4) img[decoding="auto"]');
 
-                    let test = await instagram.page.$('body[style="overflow: hidden;"]');
-                    console.log(test);
+            for (let i = 0; i < 6; i++) {
+                let post = posts[i];
 
-                    await instagram.page.waitFor(2000);
+                await post.click();
 
-                    let isLikable = await instagram.page.$('svg[aria-label="Like"]');
+                await instagram.page.waitFor('body[style="overflow: hidden;"]');
 
-                    console.log('isLikable outside if', isLikable);
+                let test = await instagram.page.$('body[style="overflow: hidden;"]');
+                console.log(test);
 
-                    if (isLikable) {
+                await instagram.page.waitFor(2000);
 
-                        console.log('isLikable inside if', isLikable);
-                        await instagram.page.click('svg[aria-label="Like"]');
+                let isLikable = await instagram.page.$('svg[aria-label="Like"]');
 
-                    }
+                console.log('isLikable outside if', isLikable);
 
-                    await instagram.page.waitFor(3000);
+                if (isLikable) {
 
-                    let closeModalButton = await instagram.page.$x('//button[contains(text(), "Close")]');
+                    console.log('isLikable inside if', isLikable);
+                    await instagram.page.click('svg[aria-label="Like"]');
 
-                    await closeModalButton[0].click();
-
-                    await instagram.page.waitFor(1000);
                 }
 
-                await instagram.page.waitFor(5000);
+                await instagram.page.waitFor(1000);
+
+                let closeModalButton = await instagram.page.$$('button > svg[aria-label="Close"]');
+                await closeModalButton[0].click();
+
+                await instagram.page.waitFor(1000);
             }
+            await instagram.page.waitFor(5000);
         }
     }
-}
+};
 
 module.exports = instagram;
